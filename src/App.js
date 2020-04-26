@@ -34,9 +34,27 @@ class App extends Component {
             imageUrl: '',
             box: {},
             route: 'signin',
-            isSignedIn: false
+            isSignedIn: false,
+            user: {
+                id: '',
+                name: '',
+                email: '',
+                entries: 0,
+                joined: ''
+            }
         }
     }
+
+    loadUser = userData => {
+        this.setState({
+            user: {
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                entries: userData.entries,
+                joined: userData.joined
+            }})
+    };
 
     onInputChange = (event) => {
         this.setState({input: event.target.value});
@@ -49,7 +67,22 @@ class App extends Component {
                 Clarifai.FACE_DETECT_MODEL,
                 this.state.input
             )
-            .then(response => this.displayFaceBox(this.calculateFaceLocation(response)))
+            .then(response => {
+                if (response) {
+                    fetch("http://localhost:3000/image", {
+                        method: "put",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({
+                            id: this.state.user.id
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(count => {
+                            this.setState(Object.assign(this.state.user, {entries: count}))
+                        })
+                }
+                this.displayFaceBox(this.calculateFaceLocation(response));
+            })
             .catch(err => console.error(err));
     };
 
@@ -80,7 +113,7 @@ class App extends Component {
     };
 
     render() {
-    const { isSignedIn, imageUrl, box, route } = this.state;
+    const { isSignedIn, imageUrl, box, route, user } = this.state;
     return (
         <div className="App">
             <Particles
@@ -93,7 +126,9 @@ class App extends Component {
                 route === 'home'
                     ?<div>
                         <Logo/>
-                        <Rank/>
+                        <Rank
+                            name={user.name}
+                            entries={user.entries} />
                         <ImageLinkForm
                             onInputChange={this.onInputChange}
                             onButtonSubmit={this.onButtonSubmit}
@@ -103,9 +138,13 @@ class App extends Component {
                             box={box}
                         />
                     </div>
-                    : (route === 'signin'
-                    ?<Signin onRouteChange={this.onRouteChange}/>
-                    :<Register onRouteChange={this.onRouteChange}/>)
+                    :(route === 'signin'
+                    ?<Signin
+                        onRouteChange={this.onRouteChange}
+                        loadUser={this.loadUser}/>
+                    :<Register
+                        onRouteChange={this.onRouteChange}
+                        loadUser={this.loadUser}/>)
             }
         </div>
     );
