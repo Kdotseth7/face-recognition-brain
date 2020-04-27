@@ -56,7 +56,7 @@ class App extends Component {
             }})
     };
 
-    onInputChange = (event) => {
+    onInputChange = event => {
         this.setState({input: event.target.value});
     };
 
@@ -86,7 +86,7 @@ class App extends Component {
             .catch(err => console.error(err));
     };
 
-    calculateFaceLocation = (data) => {
+    calculateFaceLocation = data => {
         const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
         const image = document.getElementById('inputImage');
         const width = Number(image.width);
@@ -99,11 +99,11 @@ class App extends Component {
         }
     };
 
-    displayFaceBox = (box) => {
+    displayFaceBox = box => {
         this.setState({box: box});
     };
 
-    onRouteChange = (route) => {
+    onRouteChange = route => {
         if (route === 'signout') {
             this.setState({isSignedIn: false})
         } else if (route === 'home') {
@@ -137,14 +137,18 @@ class App extends Component {
                             imageUrl={imageUrl}
                             box={box}
                         />
-                    </div>
-                    :(route === 'signin'
-                    ?<Signin
-                        onRouteChange={this.onRouteChange}
-                        loadUser={this.loadUser}/>
-                    :<Register
-                        onRouteChange={this.onRouteChange}
-                        loadUser={this.loadUser}/>)
+                     </div>
+                    :(
+                        route === 'signin'
+                            ?<Signin
+                                onRouteChange={this.onRouteChange}
+                                loadUser={this.loadUser}
+                            />
+                            :<Register
+                                onRouteChange={this.onRouteChange}
+                                loadUser={this.loadUser}
+                            />
+                            )
             }
         </div>
     );
