@@ -29,7 +29,7 @@ class Register extends Component {
             body: JSON.stringify({
                 name: this.state.registerName,
                 email: this.state.registerEmail,
-                password: this.state.password
+                password: this.state.registerPassword
             })
         })
             .then(response => response.json())
